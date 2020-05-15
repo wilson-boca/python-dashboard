@@ -8,3 +8,4 @@ junit
 .coveralls.yml
 .env
 logged_errors.csv
+.gitignore
