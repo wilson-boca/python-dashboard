@@ -23,7 +23,7 @@ layout = dict(title="EOD Microsoft", showlegend=False, xaxis=dict(rangeslider_vi
 trace_close = go.Scatter(x=list(df.index), y=list(df.Close), name="Value", line=dict(color='#ff0000'))
 data1 = [trace_close]
 data2 = [trace_close]
-fig1 = px.line(data1, x=list(df.index), y=list(df.Close), title='Time Series with Rangeslider')
+fig1 = px.line(data1, x=list(df.index), y=list(df.Close), title='Séries com Rangeslider', labels={'x': 'Mês/Ano', 'y': 'Valor de Fechamento'})
 fig1.update_xaxes(rangeslider_visible=True)
 fig2 = dict(data=data2, layout=layout)
 
@@ -78,9 +78,16 @@ labels = ['Oxygen', 'Hydrogen', 'Carbon_Dioxide', 'Nitrogen']
 values = [4500, 2500, 1053, 500]
 piechart = go.Figure(data=[go.Pie(labels=labels, values=values, pull=[0, 0, 0.2, 0])])
 
+us_cities = pd.read_csv("https://raw.githubusercontent.com/plotly/datasets/master/us-cities-top-1k.csv")
+map = px.scatter_mapbox(us_cities, lat="lat", lon="lon", hover_name="City", hover_data=["State", "Population"],
+                        color_discrete_sequence=["fuchsia"], zoom=5, height=300)
+map.update_layout(mapbox_style="open-street-map")
+map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+
 app.layout = html.Div([
     html.Div([
-        html.H1(children="POC Python Dash"),
+        html.H1(children="Python Dash/Plotly"),
         html.Img(src="/assets/stock-icon-white.png")
     ], className='banner'),
     html.Div([
@@ -105,7 +112,7 @@ app.layout = html.Div([
         ], className='six columns'),
         html.Div([
             html.Div([
-                html.H3(children='Ações do Facebook do no ano de 2017'),
+                html.H3(children='Ações do Facebook no ano de 2017'),
                 html.Div(generate_html_table()),
             ], className='six columns'),
             html.Div([
@@ -122,7 +129,8 @@ app.layout = html.Div([
                 html.H3(children='População no Canadá'),
                 html.Div(dcc.Graph(figure=fig)),
             ], className='six columns')
-        ])
+        ]),
+        html.Div(dcc.Graph(id="map", figure=map))
 
     ])
 ])
@@ -134,14 +142,14 @@ def update_stock(input_value):
     if input_value is None:
         return px.line([], x=[], y=[], title='Empty data, please select an option...')
     df = quandl.get(input_value, start_date=start, end_date=end, returns="pandas")
-    fig1 = px.line(data1, x=df.index, y=df.Close, title='Time Series with Rangeslider')
+    fig1 = px.line(data1, x=df.index, y=df.Close, title='Séries com Rangeslider', labels={'x': 'Mês Ano', 'y': 'Valor de Fechamento'})
     fig1.update_xaxes(rangeslider_visible=True,
                       rangeselector=dict(
                           buttons=list([
-                              dict(count=1, label="1 MONTH", step="month", stepmode="backward"),
-                              dict(count=6, label="6 MONTH", step="month", stepmode="backward"),
-                              dict(count=1, label="1 YEAR", step="year", stepmode="backward"),
-                              dict(step="all")
+                              dict(count=1, label="1 Mês", step="month", stepmode="backward"),
+                              dict(count=6, label="6 Meses", step="month", stepmode="backward"),
+                              dict(count=1, label="1 Ano", step="year", stepmode="backward"),
+                              dict(step="all", label="Tudo")
                           ])
                       )
     )
